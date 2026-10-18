@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0820">
+<title>EKVARA</title>
+<style>
+:root{--bg:#0b0820;--card:#17123a;--card2:#1f1850;--violet:#7c3aed;--bleu:#3b82f6;--txt:#f5f3ff;--mut:#a5a0c8;--rose:#ff2d55}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;height:100dvh;overflow:hidden}
+#app{max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;position:relative;background:var(--bg)}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+.logo{font-weight:800;font-size:22px;letter-spacing:1px;background:linear-gradient(90deg,var(--violet),var(--bleu));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tabs{display:flex;gap:18px;padding:0 16px 10px;overflow-x:auto;font-size:14px;color:var(--mut)}
+.tabs span{padding-bottom:6px;white-space:nowrap;cursor:pointer}
+.tabs .on{color:var(--txt);border-bottom:2px solid var(--violet)}
+main{flex:1;overflow-y:auto;padding:0 14px 90px}
+.screen{display:none}.screen.on{display:block}
+nav{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;background:#0f0b2b;border-top:1px solid #2a2260;padding:8px 0 max(10px,env(safe-area-inset-bottom))}
+nav button{background:none;border:0;color:var(--mut);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+nav button .ic{font-size:20px}
+nav button.on{color:var(--violet)}
+nav .plus{background:linear-gradient(135deg,var(--violet),var(--bleu));color:#fff;border-radius:12px;width:46px;height:34px;font-size:22px;justify-content:center}
+.video{position:relative;border-radius:18px;overflow:hidden;height:62vh;min-height:360px;margin-bottom:14px}
+.video .bg{position:absolute;inset:0}
+.video .shade{position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.75))}
+.side{position:absolute;right:10px;bottom:90px;display:flex;flex-direction:column;gap:14px;align-items:center;font-size:12px}
+.side button{background:none;border:0;color:#fff;font-size:26px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.side small{font-size:12px}
+.side .liked{color:var(--rose)}
+.info{position:absolute;left:12px;right:70px;bottom:14px}
+.info .u{display:flex;align-items:center;gap:8px;font-weight:700}
+.btn{background:var(--violet);color:#fff;border:0;border-radius:18px;padding:6px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.btn.off{background:transparent;border:1px solid var(--violet);color:var(--violet)}
+.info p{font-size:13px;margin-top:6px}
+.tag{color:#8ab4ff;font-size:13px}
+.av{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex:none}
+h2{font-size:17px;margin:14px 0 10px}
+.search{background:var(--card);border-radius:14px;padding:12px 14px;color:var(--mut);margin-bottom:12px;width:100%;border:0;font-size:14px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:6px}
+.chip{background:var(--card);padding:7px 14px;border-radius:18px;font-size:13px;white-space:nowrap;color:var(--mut);cursor:pointer}
+.chip.on{background:var(--violet);color:#fff}
+.creat{display:flex;gap:14px;overflow-x:auto}
+.creat div{text-align:center;font-size:12px;min-width:64px}
+.creat .av{width:60px;height:60px;font-size:22px;border:2px solid var(--violet);margin-bottom:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.thumb{position:relative;height:190px;border-radius:14px;overflow:hidden;cursor:pointer}
+.thumb .t{position:absolute;left:8px;right:8px;bottom:8px;font-size:12px;font-weight:600;text-shadow:0 1px 4px #000}
+.thumb .d{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:6px;font-size:11px}
+.cover{height:150px;border-radius:18px;margin-top:6px}
+.pinfo{display:flex;gap:12px;align-items:flex-end;margin-top:-34px;padding:0 10px}
+.pinfo .av{width:72px;height:72px;font-size:28px;border:3px solid var(--bg)}
+.stats{display:flex;justify-content:space-around;margin:14px 0;text-align:center}
+.stats b{display:block;font-size:17px}.stats span{font-size:12px;color:var(--mut)}
+.msg{display:flex;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid #20194a;cursor:pointer}
+.msg .m{flex:1;min-width:0}.msg .m b{display:block}.msg .m span{color:var(--mut);font-size:13px}
+.msg .h{color:var(--mut);font-size:12px}
+.rec{background:#000;border-radius:18px;height:64vh;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:20px;gap:16px;overflow:hidden}
+.rec .cam{position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,#4c2a85,#12082e 70%)}
+.rec>*:not(.cam){position:relative}
+.durs{display:flex;gap:18px;color:var(--mut)}.durs .on{color:#fff;font-weight:700}
+.rbtn{width:74px;height:74px;border-radius:50%;border:5px solid #fff;background:var(--rose);cursor:pointer}
+.note{font-size:12px;color:var(--mut);text-align:center;margin-top:10px}
+.back{background:none;border:0;color:var(--txt);font-size:22px;cursor:pointer;margin:8px 0}
+.badge{position:absolute!important;top:14px;left:14px;background:var(--rose);padding:5px 10px;border-radius:10px;font-size:12px;font-weight:700}
+.chat{width:100%;max-height:150px;overflow:hidden;font-size:13px;display:flex;flex-direction:column;gap:5px;justify-content:flex-end}
+.chat div{background:rgba(0,0,0,.45);padding:5px 10px;border-radius:10px;align-self:flex-start}
+.mic{width:54px;height:54px;border-radius:50%;border:0;background:var(--card2);font-size:24px;cursor:pointer}
+.mic.mute{background:#444;opacity:.6}
+.rec canvas{width:100%;height:100%;object-fit:cover;display:block}
+.rec .tools{position:absolute!important;right:10px;top:16px;display:flex;flex-direction:column;gap:12px;z-index:3}
+.tools button,.side2{background:rgba(0,0,0,.4);border:0;color:#fff;border-radius:12px;padding:6px 8px;font-size:20px;display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:52px}
+.tools small,.side2 small{font-size:10px}
+.panel{width:100%;display:flex;gap:8px;overflow-x:auto;z-index:3}
+.panel .chip{background:rgba(0,0,0,.55);color:#fff}
+.panel .chip.on{background:var(--violet)}
+.recrow{width:100%;display:flex;justify-content:space-between;align-items:center;z-index:3}
+.rbtn{transition:.2s}.rbtn.on{border-radius:18px;transform:scale(.8)}
+.toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:var(--card2);padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:9;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="toast" id="toast"></div>
+  <header>
+    <div class="logo">EKVARA</div>
+    <div style="font-size:20px;display:flex;gap:16px"><span onclick="go('live')">🎙️</span><span onclick="go('decouvrir')">🔍</span><span onclick="toast('Aucune nouvelle notification')">🔔</span></div>
+  </header>
+
+  <main id="main">
+    <!-- POUR TOI -->
+    <section class="screen on" id="accueil">
+      <div class="tabs"><span class="on">Pour toi</span><span>Suivis</span><span>Tendances</span><span onclick="go('live')" style="color:var(--rose);font-weight:700">🎙️ Live</span><span>Mode</span></div>
+      <div id="feed"></div>
+    </section>
+
+    <!-- DECOUVRIR -->
+    <section class="screen" id="decouvrir">
+      <h2 style="font-size:22px">Découvrir</h2>
+      <button class="search">🔍 Rechercher des créatrices, des vidéos…</button>
+      <div class="chips" id="chips"></div>
+      <h2>Créatrices populaires</h2>
+      <div class="creat" id="creat"></div>
+      <h2>Vidéos recommandées</h2>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- CREER -->
+    <section class="screen" id="creer">
+      <h2 style="font-size:22px">Créer une vidéo</h2>
+      <div class="rec" id="recBox"><div class="cam"><canvas id="cv"></canvas></div>
+        <video id="vid" playsinline muted style="display:none"></video>
+        <input type="file" id="imp" accept="video/*" style="display:none">
+        <div class="tools">
+          <button onclick="flipCam()">🔄<small>Retourner</small></button>
+          <button onclick="panel('filtres')">🎨<small>Filtres</small></button>
+          <button onclick="panel('effets')">✨<small>Effets</small></button>
+          <button onclick="addText()">Aa<small>Texte</small></button>
+          <button onclick="panel('stickers')">😊<small>Stickers</small></button>
+          <button onclick="panel('qualite')">⚙️<small id="qlab">720p</small></button>
+        </div>
+        <div class="panel" id="panel"></div>
+        <div id="timer" style="font-weight:700;min-height:18px"></div>
+        <div class="durs" id="durs"><span data-s="15">15s</span><span class="on" data-s="60">60s</span><span data-s="180">3min</span><span data-s="600">10min</span></div>
+        <div class="recrow">
+          <button class="side2" onclick="$('#imp').click()">📁<small>Importer</small></button>
+          <button class="rbtn" id="rbtn" onclick="toggleRec()"></button>
+          <button class="side2" onclick="toast('Galerie bientôt disponible')">🖼️<small>Galerie</small></button>
+        </div>
+      </div>
+      <div id="result"></div>
+      <p class="note">La caméra demande ton autorisation. Les filtres, textes et stickers sont enregistrés dans la vidéo.</p>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="screen" id="messages">
+      <h2 style="font-size:22px">Messages</h2>
+      <div class="chips"><span class="chip on">Tous</span><span class="chip">Abonnements</span><span class="chip">Demandes</span></div>
+      <div id="msgs"></div>
+    </section>
+
+    <!-- LIVE -->
+    <section class="screen" id="live">
+      <button class="back" onclick="go('accueil')">←</button>
+      <h2 style="font-size:22px;margin-top:0">🔴 Live</h2>
+      <div class="rec" id="liveBox"><div class="cam"></div>
+        <div class="badge" id="liveBadge" style="display:none">🔴 EN DIRECT · <span id="viewers">0</span> 👁</div>
+        <div class="chat" id="chat"></div>
+        <div style="display:flex;gap:18px;align-items:center">
+          <button class="mic" id="micBtn" onclick="toggleMic()">🎙️</button>
+          <button class="btn" id="liveBtn" style="padding:14px 22px;font-size:15px" onclick="toggleLive()">Démarrer le live</button>
+        </div>
+      </div>
+      <p class="note">Prototype : le vrai direct vidéo demande un serveur de streaming (développeur + budget).</p>
+      <h2>Lives en cours</h2>
+      <div id="liveList"></div>
+    </section>
+
+    <!-- PROFIL -->
+    <section class="screen" id="profil">
+      <div class="menu">
+        <button onclick="go('monet')">💰<span>Monétisation</span></button>
+        <button onclick="go('assistant')">🤖<span>Assistant</span></button>
+        <button onclick="go('params')">⚙️<span>Paramètres</span></button>
+      </div>
+      <div id="profilBox"></div>
+    </section>
+  </main>
+
+  <nav>
+    <button class="on" data-s="accueil"><span class="ic">🏠</span>Accueil</button>
+    <button data-s="decouvrir"><span class="ic">🧭</span>Découvrir</button>
+    <button class="plus" data-s="creer">+</button>
+    <button data-s="messages"><span class="ic">💬</span>Messages</button>
+    <button data-s="profil"><span class="ic">👤</span>Profil</button>
+  </nav>
+</div>
+
+<script>
+const C=[
+ {id:'aissatou',n:'Aïssatou Diarra',h:'@aissatou_diarra',c:['#7c3aed','#3b82f6'],bio:'Créatrice de contenu | Voyage | Lifestyle',ab:'168,5K'},
+ {id:'fatou',n:'Fatou_Senegal',h:'@fatou_senegal',c:['#db2777','#f59e0b'],bio:'Culture, mode et beauté africaine',ab:'982K'},
+ {id:'mariam',n:'Mariam_Officiel',h:'@mariam_officiel',c:['#059669','#3b82f6'],bio:'Cuisine et recettes faciles',ab:'756K'},
+ {id:'linda',n:'Linda_Officiel',h:'@linda_officiel',c:['#ea580c','#7c3aed'],bio:'Motivation et développement personnel',ab:'643K'}
+];
+const V=[
+ {u:0,t:'Ma journée à Ouaga',tags:'#femme #rêve #afrique',d:'2:15',l:'2,4K'},
+ {u:1,t:'La beauté de notre culture ❤️',tags:'#senegal #culture #afrique',d:'3:45',l:'24,8K'},
+ {u:2,t:'Recette facile et rapide',tags:'#cuisine #maison',d:'3:42',l:'5,7K'},
+ {u:3,t:'La vie est plus belle quand on croit en soi ❤️',tags:'#motivation #rêve #afrique',d:'1:10',l:'12,4K'}
+];
+const grad=c=>`linear-gradient(135deg,${c[0]},${c[1]})`;
+const ini=n=>n.replace(/[^A-Za-zÀ-ÿ]/g,'').charAt(0).toUpperCase();
+const av=(i,s)=>`<span class="av" ${s?`style="width:${s}px;height:${s}px"`:''} style="background:${grad(C[i].c)}">${ini(C[i].n)}</span>`;
+const $=s=>document.querySelector(s);
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)};
+const followed={};
+
+function renderFeed(){
+ $('#feed').innerHTML=V.map((v,i)=>{const c=C[v.u];return `
+ <div class="video"><div class="bg" style="background:${grad(c.c)}"></div><div class="shade"></div>
+  <div class="side">
+   <button onclick="like(this)">🤍<small>${v.l}</small></button>
+   <button onclick="toast('Commentaires bientôt disponibles')">💬<small>842</small></button>
+   <button onclick="share()">↗️<small>Partager</small></button>
+  </div>
+  <div class="info"><div class="u">${av(v.u)}<span>${c.h}</span><button class="btn ${followed[v.u]?'off':''}" onclick="follow(${v.u})">${followed[v.u]?'Suivie':'Suivre'}</button></div>
+   <p>${v.t}</p><p class="tag">${v.tags}</p><p style="font-size:12px;color:#ddd;margin-top:4px">🎵 Son original - ${c.n}</p></div>
+ </div>`}).join('');
+}
+function like(b){const on=b.classList.toggle('liked');b.firstChild.textContent=on?'❤️':'🤍'}
+function share(){const d={title:'EKVARA',text:'Découvre EKVARA',url:location.href};navigator.share?navigator.share(d).catch(()=>{}):toast('Lien copié (simulation)')}
+function follow(i){followed[i]=!followed[i];renderFeed();renderProfil(cur);toast(followed[i]?'Tu suis '+C[i].n:'Désabonnée')}
+
+function renderDecouvrir(){
+ $('#chips').innerHTML=['Toutes','Beauté','Mode','Cuisine','Voyage','Sport'].map((x,i)=>`<span class="chip ${i?'':'on'}" onclick="chip(this)">${x}</span>`).join('');
+ $('#creat').innerHTML=C.map((c,i)=>`<div onclick="openProfil(${i})">${av(i)}<br>${c.n.split(' ')[0].replace('_Officiel','')}<br><span style="color:var(--mut)">${c.ab}</span></div>`).join('');
+ $('#grid').innerHTML=V.map(v=>`<div class="thumb" onclick="openProfil(${v.u})" style="background:${grad(C[v.u].c)}"><span class="d">${v.d}</span><span class="t">${v.t}<br>❤ ${v.l}</span></div>`).join('');
+}
+function chip(e){e.parentNode.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));e.classList.add('on')}
+
+const M=[['Aïssatou Diarra','En ligne',0,'1h'],['Fatou_Senegal','Tu es incroyable !',1,'2 min'],['Mariam_Officiel','Merci pour ton soutien ❤️',2,'5 min'],['Linda_Officiel','À bientôt !',3,'12 min']];
+function renderMsgs(){$('#msgs').innerHTML=M.map(m=>`<div class="msg" onclick="toast('Conversation bientôt disponible')">${av(m[2])}<div class="m"><b>${m[0]}</b><span>${m[1]}</span></div><span class="h">${m[3]}</span></div>`).join('')}
+
+let cur=0;
+function renderProfil(i){cur=i;const c=C[i];
+ $('#profilBox').innerHTML=`<div class="cover" style="background:${grad(c.c)}"></div>
+ <div class="pinfo">${av(i)}<div style="flex:1"><b style="font-size:18px">${c.n} ✔️</b><div style="color:var(--mut);font-size:13px">${c.h}</div></div><button class="btn ${followed[i]?'off':''}" onclick="follow(${i})">${followed[i]?'Suivie':'Suivre'}</button></div>
+ <p style="margin:12px 4px;font-size:14px">${c.bio} 🌍</p>
+ <div class="stats"><div><b>${c.ab}</b><span>Abonnés</span></div><div><b>248</b><span>Abonnements</span></div><div><b>432</b><span>Vidéos</span></div></div>
+ <div class="tabs"><span class="on">Vidéos</span><span>À propos</span><span>J'aime</span></div>
+ <div class="grid">${V.map(v=>`<div class="thumb" style="background:${grad(C[(v.u+i)%4].c)}"><span class="d">${v.d}</span><span class="t">${v.t}</span></div>`).join('')}</div>`}
+function openProfil(i){renderProfil(i);go('profil')}
+
+function go(s){
+ document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('on',e.id===s));
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+ $('#main').scrollTop=0;
+ if(s==='creer')startCam();else{if(rec&&rec.state==='recording')rec.stop();stopCam()}
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.s));
+document.querySelectorAll('#durs span').forEach(s=>s.onclick=()=>{document.querySelectorAll('#durs span').forEach(x=>x.classList.remove('on'));s.classList.add('on');maxS=+s.dataset.s});
+
+let liveOn=false,micOn=true,liveT=null,viewers=0;
+const FAKE=['Bonjour tout le monde 👋','Tu es magnifique ❤️','Salut depuis Ouaga !','Bravo pour ton live 🔥','Vive l\'Afrique 🌍','On t\'aime 😍'];
+function toggleMic(){micOn=!micOn;const b=$('#micBtn');b.classList.toggle('mute',!micOn);b.textContent=micOn?'🎙️':'🔇';toast(micOn?'Micro activé':'Micro coupé')}
+function toggleLive(){
+ liveOn=!liveOn;
+ $('#liveBtn').textContent=liveOn?'Arrêter le live':'Démarrer le live';
+ $('#liveBadge').style.display=liveOn?'block':'none';
+ clearInterval(liveT);
+ if(liveOn){viewers=0;$('#chat').innerHTML='';
+  liveT=setInterval(()=>{viewers+=Math.floor(Math.random()*6)+1;$('#viewers').textContent=viewers;
+   const c=document.createElement('div');c.textContent=FAKE[Math.floor(Math.random()*FAKE.length)];
+   const ch=$('#chat');ch.appendChild(c);while(ch.children.length>4)ch.removeChild(ch.firstChild)},1500);
+  toast('Live simulé démarré')}
+ else toast('Live terminé');
+}
+$('#liveList').innerHTML=C.map((c,i)=>`<div class="msg" onclick="toast('Live de ${c.n} (simulation)')">${av(i)}<div class="m"><b>${c.n}</b><span>🔴 En direct · ${(i+1)*37} spectateurs</span></div></div>`).join('');
+
+/* ===== CAMERA, FILTRES, ENREGISTREMENT ===== */
+let stream=null,facing='user',filt='none',eff={smooth:false,zoom:false},txts=[],stks=[],rec=null,chunks=[],recT=null,secs=0,maxS=60;
+const FN=['Normal','Éclat','Chaud','Froid','N&B','Vintage','Doux'];
+const FV=['none','brightness(1.15) contrast(1.1) saturate(1.2)','sepia(.35) saturate(1.4) hue-rotate(-10deg)','saturate(1.1) hue-rotate(15deg) brightness(1.05)','grayscale(1)','sepia(.7) contrast(1.1)','blur(1px) brightness(1.08)'];
+const QL={'480p':[270,480],'720p':[720,1280],'1080p':[1080,1920]};
+const cv=$('#cv');
+function setQ(q){if(rec&&rec.state==='recording'){toast('Arrête l\'enregistrement d\'abord');return}
+ cv.width=QL[q][0];cv.height=QL[q][1];$('#qlab').textContent=q;
+ if(stream)startCam(q)}
+async function startCam(q){
+ stopCam();
+ const h=(q||$('#qlab').textContent)==='1080p'?1920:(q||$('#qlab').textContent)==='480p'?640:1280;
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,height:{ideal:h}},audio:true});
+  const v=$('#vid');v.srcObject=stream;await v.play();
+ }catch(e){stream=null;toast('Caméra non autorisée ou indisponible')}
+}
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+function flipCam(){facing=facing==='user'?'environment':'user';startCam()}
+function draw(){
+ const x=cv.getContext('2d'),v=$('#vid');
+ x.save();x.fillStyle='#12082e';x.fillRect(0,0,cv.width,cv.height);
+ if(stream&&v.videoWidth){
+  x.filter=(filt==='none'?'':filt)+(eff.smooth?' blur(0.8px) brightness(1.06)':'');
+  const s=Math.max(cv.width/v.videoWidth,cv.height/v.videoHeight)*(eff.zoom?1.3:1);
+  const w=v.videoWidth*s,h=v.videoHeight*s;
+  if(facing==='user'){x.translate(cv.width,0);x.scale(-1,1)}
+  x.drawImage(v,(cv.width-w)/2,(cv.height-h)/2,w,h);
+ }
+ x.restore();
+ x.textAlign='center';x.textBaseline='middle';
+ txts.forEach(t=>{x.font='bold '+cv.width*0.08+'px system-ui';x.lineWidth=cv.width*0.012;x.strokeStyle='#000';x.fillStyle='#fff';x.strokeText(t.t,cv.width*t.x,cv.height*t.y);x.fillText(t.t,cv.width*t.x,cv.height*t.y)});
+ stks.forEach(s=>{x.font=cv.width*0.18+'px system-ui';x.fillText(s.e,cv.width*s.x,cv.height*s.y)});
+ requestAnimationFrame(draw);
+}
+function panel(k){
+ const p=$('#panel');
+ if(p.dataset.k===k&&p.innerHTML){p.innerHTML='';p.dataset.k='';return}
+ p.dataset.k=k;
+ if(k==='filtres')p.innerHTML=FN.map((n,i)=>`<span class="chip ${FV[i]===filt?'on':''}" onclick="setF(${i})">${n}</span>`).join('');
+ if(k==='effets')p.innerHTML=`<span class="chip ${eff.smooth?'on':''}" onclick="setE('smooth')">Lissage</span><span class="chip ${eff.zoom?'on':''}" onclick="setE('zoom')">Zoom</span><span class="chip" onclick="txts=[];stks=[];toast('Textes et stickers effacés')">Effacer tout</span>`;
+ if(k==='stickers')p.innerHTML=['😍','🔥','❤️','🌍','✨','👑','😂','🇧🇫'].map(e=>`<span class="chip" onclick="addSt('${e}')">${e}</span>`).join('');
+ if(k==='qualite')p.innerHTML=Object.keys(QL).map(q=>`<span class="chip ${$('#qlab').textContent===q?'on':''}" onclick="setQ('${q}');panel('qualite');panel('qualite')">${q}</span>`).join('');
+}
+function setF(i){filt=FV[i];$('#panel').dataset.k='';panel('filtres')}
+function setE(k){eff[k]=!eff[k];$('#panel').dataset.k='';panel('effets')}
+function addSt(e){stks.push({e,x:.25+Math.random()*.5,y:.25+Math.random()*.4})}
+function addText(){const t=prompt('Ton texte :');if(t)txts.push({t,x:.5,y:.2+txts.length*.1})}
+function toggleRec(){
+ if(rec&&rec.state==='recording'){rec.stop();return}
+ if(!stream){toast('Autorise la caméra d\'abord');startCam();return}
+ const cs=cv.captureStream(30);
+ stream.getAudioTracks().forEach(t=>cs.addTrack(t));
+ chunks=[];
+ try{rec=new MediaRecorder(cs)}catch(e){toast('Enregistrement non supporté sur ce téléphone');return}
+ rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+ rec.onstop=()=>{clearInterval(recT);$('#rbtn').classList.remove('on');$('#timer').textContent='';
+  const b=new Blob(chunks,{type:rec.mimeType||'video/webm'}),u=URL.createObjectURL(b);
+  $('#result').innerHTML=`<h2>Ta vidéo</h2><video src="${u}" controls playsinline style="width:100%;border-radius:14px"></video><a class="btn" style="display:inline-block;margin-top:10px;text-decoration:none" href="${u}" download="ekvara-video.webm">Télécharger</a>`};
+ rec.start();secs=0;$('#rbtn').classList.add('on');
+ recT=setInterval(()=>{secs++;$('#timer').textContent='🔴 '+Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0')+' / '+Math.floor(maxS/60)+':'+String(maxS%60).padStart(2,'0');if(secs>=maxS)rec.stop()},1000);
+}
+$('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const u=URL.createObjectURL(f);
+ $('#result').innerHTML=`<h2>Vidéo importée</h2><video src="${u}" controls playsinline style="width:100%;border-radius:14px"></video>`};
+setQ('720p');draw();
+
+renderFeed();renderDecouvrir();renderMsgs();renderProfil(0);
+</script>
+</body>
+</html>
